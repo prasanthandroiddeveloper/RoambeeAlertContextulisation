@@ -1,3 +1,15 @@
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: "sanjeeviprasanth@gmail.com",
+    pass: "Badarinarayanarekha",
+  },
+});
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -29,6 +41,21 @@ app.get("/endpoint", function (req, res) {
     console.log("Door opened");
   } else {
     console.log("Door Fully opened");
+    var mailOptions = {
+      from: "sanjeeviprasanth@gmail.com",
+      to: "githubprasanth@gmail.com",
+      subject: "Door Opened",
+      text: `Container Door Opened Alert.`,
+      // html: '<h1>Hi Smartherd</h1><p>Your Messsage</p>'
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
   }
 
   fs.writeFile("log.txt", JSON.stringify(req.query), function (err) {
