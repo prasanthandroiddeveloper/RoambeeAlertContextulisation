@@ -44,8 +44,8 @@ app.get("/endpoint", function (req, res) {
     var mailOptions = {
       from: "sanjeeviprasanth@gmail.com",
       to: "githubprasanth@gmail.com",
-      subject: "Door Opened",
-      text: `Container Door Opened Alert.`,
+      subject: "Roambee Alert",
+      text: `Container Door Opened Alert`,
       // html: '<h1>Hi Smartherd</h1><p>Your Messsage</p>'
     };
 
