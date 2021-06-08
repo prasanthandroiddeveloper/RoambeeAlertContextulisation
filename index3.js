@@ -1,14 +1,15 @@
 const nodemailer = require("nodemailer");
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: "sanjeeviprasanth@gmail.com",
-    pass: "Badarinarayanarekha",
-  },
-});
+const smtpTransport = require("nodemailer-smtp-transport");
+const transporter = nodemailer.createTransport(
+  smtpTransport({
+    host: "mi3-ls19.a2hosting.com",
+    secure: true,
+    auth: {
+      user: "demo@sssbi.com",
+      pass: "Admin@2020",
+    },
+  })
+);
 
 const express = require("express");
 const app = express();
@@ -29,16 +30,27 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get("/webhook", function (req, res) {
+app.get("/", function (req, res) {
   //io.sockets.emit("FromAPI", req.query + " : Updated");
   console.log(JSON.stringify(req.query), "params");
   const axios = require("axios");
 
   const ambient = req.query.ambient;
   const shipmentId = req.query.shipment_id;
+  const bee_name = req.query.bee_name;
+  const destination = req.query.destination;
+  var message = "";
   console.log(req.query.ambient, "ambient level");
-
-  if (ambient > 10) {
+  if (ambient <= 1) {
+    message = "Door is Closed";
+  } else if (ambient > 2 && ambient <= 5) {
+    message = "Door maybe open";
+  } else if (ambient >= 6) {
+    message = "Door is open";
+    console.log("Door is open");
+    // res.send({msg:"Door Closed"});
+  }
+  if (message) {
     axios
       .post(
         `https://portal.roambee.com/services/shipment/get2?sid=${shipmentId}&apikey=f1970070-b231-4927-a004-e7bedae5a80c`
@@ -55,18 +67,20 @@ app.get("/webhook", function (req, res) {
               if (record.email) {
                 console.log(record.email);
                 var mailOptions = {
-                  from: "sanjeeviprasanth@gmail.com",
+                  from: "demo@sssbi.com",
                   to: record.email,
                   subject: "Roambee Alert",
-                  text: `Container Door Opened Alert`,
+                  text: `Container ${message} Alert on ${bee_name} to destination ${destination}`,
                   // html: '<h1>Hi Smartherd</h1><p>Your Messsage</p>'
                 };
 
                 transporter.sendMail(mailOptions, function (error, info) {
                   if (error) {
                     console.log(error);
+                    // res.send({msg:"error"});
                   } else {
                     console.log("Email sent: " + info.response);
+                    // res.send({msg:"sent"});
                   }
                 });
               }
@@ -76,11 +90,9 @@ app.get("/webhook", function (req, res) {
       .catch((error) => {
         console.error(error);
       });
-  } else {
-    console.log("Door Closed");
   }
 
-  fs.writeFile("log.txt", JSON.stringify(req.query), function (err) {
+  fs.appendFile("log.txt", JSON.stringify(req.query), function (err) {
     if (err) return console.log(err);
     console.log("Hello World > helloworld.txt");
   });

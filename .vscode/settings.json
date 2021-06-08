@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/765e8121-e7a7-46e8-bd50-0da112010a98/resourceGroups/demo11/providers/Microsoft.Web/sites/testazureprojectroambee",
+    "appService.deploySubpath": "."
+}
